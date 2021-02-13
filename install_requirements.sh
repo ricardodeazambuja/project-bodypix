@@ -16,12 +16,14 @@
 if grep -s -q "Mendel" /etc/os-release; then
   echo "Installing DevBoard specific dependencies"
   sudo apt-get install python3-pip python3-scipy
-  sudo pip3 install svgwrite
   sudo pip3 install python-periphery 
+  sudo pip3 install opencv-python
 else
   # Install gstreamer 
-  sudo apt-get install -y gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python3-gst-1.0 python3-gi
-  pip3 install svgwrite
+  # sudo apt-get install -y gstreamer1.0-plugins-bad gstreamer1.0-plugins-good python3-gst-1.0 python3-gi
+  pip3 install pillow
+  pip3 install opencv-python
+  pip3 install tflite-runtime
 
   if grep -s -q "Raspberry Pi" /sys/firmware/devicetree/base/model; then
     echo "Installing Raspberry Pi specific dependencies"
@@ -31,5 +33,8 @@ else
       echo bcm2835-v4l2 | sudo tee -a /etc/modules
     fi
     sudo modprobe bcm2835-v4l2 
+    echo "For RPI Zero (armv6), check https://github.com/ricardodeazambuja/libedgetpu/releases/tag/rpi0_tflite_edgetpu"
   fi
+
+  sudo apt install libedgetpu1-std # use libedgetpu1-max for maximum performance
 fi

@@ -24,8 +24,8 @@ from PIL import Image
 from tflite_runtime.interpreter import load_delegate
 from tflite_runtime.interpreter import Interpreter
 
-from pycoral.adapters.common import output_tensor
-from pycoral.utils.edgetpu import run_inference
+# from pycoral.adapters.common import output_tensor
+# from pycoral.utils.edgetpu import run_inference
 
 EDGETPU_SHARED_LIB = 'libedgetpu.so.1'
 POSENET_SHARED_LIB = os.path.join(
@@ -109,7 +109,7 @@ class Keypoint:
         self.score = score
 
     def __repr__(self):
-        return 'Keypoint(<{}>, {}, {})'.format(KEYPOINTS[self.k], self.yx, self.score)
+        return 'Keypoint(<{}>, {}, {})'.format(self.k, self.yx, self.score)
 
 
 class Pose:
@@ -145,6 +145,7 @@ class PoseEngine:
             model_path, experimental_delegates=[edgetpu_delegate, posenet_decoder_delegate])
         self._interpreter.allocate_tensors()
         self._input_tensor_shape = self._interpreter.get_input_details()[0]['shape']
+        self._input_details = self._interpreter.get_input_details()
         if (self._input_tensor_shape.size != 4 or
                 self._input_tensor_shape[3] != 3 or
                 self._input_tensor_shape[0] != 1):
@@ -192,13 +193,7 @@ class PoseEngine:
         assert (img.shape == tuple(self._input_tensor_shape[1:]))
 
         # Run the inference (API expects the data to be flattened)
-        inference_time, outputs = self.run_inference(img.flatten())
-        poses = self._parse_poses(outputs)
-        heatmap, bodyparts = self._parse_heatmaps(outputs)
-        return inference_time, poses, heatmap, bodyparts
-
-    def DetectPosesInTensor(self, tensor):
-        inference_time, output = self.run_inference(tensor)
+        inference_time, outputs = self.run_inference(img)
         poses = self._parse_poses(outputs)
         heatmap, bodyparts = self._parse_heatmaps(outputs)
         return inference_time, poses, heatmap, bodyparts
@@ -244,7 +239,8 @@ class PoseEngine:
 
     def run_inference(self, input):
         start_time = time.monotonic()
-        run_inference(self._interpreter, input)
+        self._interpreter.set_tensor(self._input_details[0]['index'], np.expand_dims(input, axis=0))
+        self._interpreter.invoke()
         duration_ms = (time.monotonic() - start_time) * 1000
 
         output = []

@@ -1,4 +1,6 @@
-# Coral BodyPix
+# Coral BodyPix... **but using OpenCV instead of Gstreamer...**
+## [...and an example creating a virtual (fake) webcam (sorry, Linux only)](pyfakewebcam_example.py)
+![](media/fakewebcam_coral_edgetpu.png)
 
 BodyPix is an open-source machine learning model which allows for person and
 body-part segmentation. This has previously been released as a
@@ -125,29 +127,3 @@ entire outline of the person is indicated.
 ```bash
 python3 bodypix.py --anonymize
 ```
-
-### bodypix_gl_imx.py
-
-This example is optimized specifically for the iMX8MQ GPU and VPU found on the
-Coral Dev Board. It is intended to allow real time processing and rendering on
-the platform (able to achieve 30 FPS even at 1280x720 resolution). The flags
- for input (models, camera configuration) are the same but we enable
- toggling between display modes with key presses instead of a flag:
-
-```bash
-python3 bodypix_gl_imx.py
-```
-
-The following key presses can be used to toggle various modes:
-
-```bash
-Toggle PoseNet-style Skeletons: 's'
-Toggle Bounding Boxes: 'b'
-Toggle Anonymizer: 'a'
-Toggle Aggregated Heatmap Generation: 'h'
-Toggle Body Part Segmentation: 'p'
-Reset: 'r'
-```
-
-
-
