@@ -21,7 +21,13 @@ from bodypix import *
 width = 640
 height = 480
 
-camera = pyfakewebcam.FakeWebcam('/dev/video2', width, height)
+try:
+    camera = pyfakewebcam.FakeWebcam('/dev/video2', width, height)
+except FileNotFoundError:
+    print("""Did you follow the instructions to enable v4l2loopback? 
+    https://ricardodeazambuja.com/python/2021/02/13/edgetpu_virtual_webcam/
+    """)
+    raise
 
 try:
     cap = cv.VideoCapture(0)
