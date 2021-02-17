@@ -36,7 +36,7 @@ try:
 
     model = f'models/bodypix_mobilenet_v1_075_{width}_{height}_16_quant_edgetpu_decoder.tflite'
 
-    poseseg = PoseSeg(model, anonymize=True, bodyparts=False, drawposes=False)
+    poseseg = PoseSeg(model, anonymize=True, bodyparts=False, drawposes=True)
 
     if not cap.isOpened():
         print("Cannot open camera")
@@ -54,7 +54,7 @@ try:
         img = cv.cvtColor(frame, cv.COLOR_BGR2RGB)
         
         # Display the resulting frame
-        img = cv.cvtColor(poseseg.process(img, only_mask=False), cv.COLOR_RGB2BGR)
+        img = cv.cvtColor(poseseg.process(img, only_mask=False, use_heatmap=False), cv.COLOR_RGB2BGR)
 
         camera.schedule_frame(img)
 except KeyboardInterrupt:

@@ -56,7 +56,7 @@ class PoseSeg:
     inference_size = (self.engine.image_width, self.engine.image_height)
     print('Inference size: {}'.format(inference_size))
 
-  def process(self, image, only_mask = False):
+  def process(self, image, only_mask = False, use_heatmap = True):
     start_time = time.monotonic()
     inference_time, poses, heatmap, bodyparts = self.engine.DetectPosesInImage(image)
 
@@ -103,7 +103,11 @@ class PoseSeg:
     else:
       self.background_image = image
 
-    output_image = self.background_image + rgb_heatmap
+    if use_heatmap: # to allow the use of the pose only
+      output_image = self.background_image + rgb_heatmap
+    else:
+      output_image = self.background_image
+      
     int_img = np.uint8(np.clip(output_image,0,255))
 
     end_time = time.monotonic()
